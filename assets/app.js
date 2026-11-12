@@ -1,0 +1,8 @@
+document.documentElement.classList.add('js');
+const themeButton=document.querySelector('.theme');
+const storedTheme=(()=>{try{return localStorage.getItem('ruruka-theme')}catch{return null}})();
+function setTheme(dark){document.body.classList.toggle('dark',dark);themeButton.textContent=dark?'☀':'☾';themeButton.setAttribute('aria-label',dark?'切换到浅色模式':'切换到深色模式');themeButton.setAttribute('aria-pressed',String(dark));}
+setTheme(storedTheme?storedTheme==='dark':matchMedia('(prefers-color-scheme: dark)').matches);
+themeButton.addEventListener('click',()=>{const dark=!document.body.classList.contains('dark');setTheme(dark);try{localStorage.setItem('ruruka-theme',dark?'dark':'light')}catch{}});
+const search=document.querySelector('#search');
+if(search){const cards=[...document.querySelectorAll('.post-card')];const filters=[...document.querySelectorAll('.filter')];let category='全部';function filter(){const query=search.value.trim().toLocaleLowerCase();let count=0;cards.forEach(card=>{const show=(category==='全部'||card.dataset.category===category)&&card.dataset.search.toLocaleLowerCase().includes(query);card.hidden=!show;if(show)count++});document.querySelector('#result-count').textContent=`${count} 篇文章`;document.querySelector('#empty').hidden=count!==0;filters.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.category===category)))}search.addEventListener('input',filter);filters.forEach(b=>b.addEventListener('click',()=>{category=b.dataset.category;filter()}));const requested=new URLSearchParams(location.search).get('category');if(filters.some(b=>b.dataset.category===requested))category=requested;filter();}

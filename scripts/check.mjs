@@ -1,0 +1,4 @@
+import fs from 'node:fs';import path from 'node:path';import {fileURLToPath} from 'node:url';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../docs');let checked=0;
+for(const name of fs.readdirSync(root).filter(x=>x.endsWith('.html'))){const html=fs.readFileSync(path.join(root,name),'utf8');if(!html.includes('<html lang="zh-CN">')||!html.includes('name="viewport"'))throw Error('Missing language or viewport: '+name);for(const match of html.matchAll(/(?:href|src)="([^"#]+)[^"]*"/g)){let url=match[1].split('#')[0].split('?')[0];if(url.startsWith('http'))continue;if(url.startsWith('/Ruruka/'))url=url.slice('/Ruruka/'.length);if(!url)url='index.html';if(!fs.existsSync(path.join(root,decodeURIComponent(url))))throw Error(`${name}: missing ${url}`);checked++;}}
+console.log(`OK: ${checked} local links/assets checked.`);
